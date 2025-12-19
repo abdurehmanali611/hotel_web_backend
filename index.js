@@ -1,18 +1,20 @@
-const express = require("express");
-const { ApolloServer, gql } = require("apollo-server-express");
-const cors = require("cors");
-const { PrismaClient } = require("./generated/prisma");
-const bcrypt = require("bcryptjs");
+import express from "express";
+import { ApolloServer, gql } from "apollo-server-express";
+import cors from "cors";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import 'dotenv/config';
 
 const prisma = new PrismaClient();
 
 const typeDefs = gql`
   type User {
     id: Int!
-    username: String!
-    hotelName: String!
-    password: String!
-    role: String!
+    UserName: String!
+    HotelName: String!
+    Password: String!
+    Role: String!
+    LogoUrl: String!
   }
 
   type Query {
@@ -20,7 +22,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    CreateAdmin(username: String!, password: String!, role: String!, hotelName: String!): User!
+    CreateAdmin(UserName: String!, Password: String!, Role: String!, HotelName: String!, LogoUrl: String!): User!
   }
 `;
 
@@ -31,10 +33,10 @@ const resolvers = {
     },
   },
   Mutation: {
-    CreateAdmin: async (_, { username, password, role, hotelName }) => {
-      const hashedPassword = await bcrypt.hash(password, 12);
+    CreateAdmin: async (_, { UserName, Password, Role, HotelName, LogoUrl }) => {
+      const hashedPassword = await bcrypt.hash(Password, 12);
       return await prisma.user.create({
-        data: { username, password: hashedPassword, role, hotelName },
+        data: { UserName, Password: hashedPassword, Role, HotelName, LogoUrl },
       });
     },
   },
@@ -54,8 +56,10 @@ async function startServer() {
 
   const port = 4000;
   app.listen(port, () => {
-    console.log(`server ready at http://localhost:${port}/graphql`);
+    console.log(`Server ready at http://localhost:${port}/graphql`);
   });
 }
 
-startServer();
+startServer().catch((error) => {
+  console.error("Server startup error:", error);
+});

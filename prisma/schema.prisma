@@ -11,13 +11,13 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 model user {
   id Int @id @default(autoincrement())
-  hotelName String
-  username String @unique
-  password String
-  role String
+  HotelName String
+  UserName String @unique
+  Password String
+  Role String
+  LogoUrl String
 }

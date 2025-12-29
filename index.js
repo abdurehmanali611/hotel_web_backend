@@ -34,6 +34,13 @@ const resolvers = {
   },
   Mutation: {
     CreateAdmin: async (_, { UserName, Password, Role, HotelName, LogoUrl }) => {
+      const existingUser = await prisma.user.findUnique({
+        where: { UserName: UserName, HotelName: HotelName },
+      });
+      if (existingUser) {
+        throw new Error("User already exists");
+      }
+
       const hashedPassword = await bcrypt.hash(Password, 12);
       return await prisma.user.create({
         data: { UserName, Password: hashedPassword, Role, HotelName, LogoUrl },
